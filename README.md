@@ -1,1 +1,5 @@
 # demand-forecasting-and-production-planner
+
+Abstract:
+The project focuses on forecasting demand in retail using ARIMA time series analysis. Historical retail data is utilized for prediction, with accuracy assessed via mean squared error (MSE) through time series cross-validation. Additionally, production planning is integrated based on forecasted demand, assuming a 20% increase. This strategy aids in proactive resource allocation and inventory management. The final step involves visualizing production planning quantities using matplotlib, generating Gantt charts for the last and first five forecasted values. These visual aids offer clear insights into production plans derived from forecasted demand, facilitating decision-making in production scheduling and resource allocation. In summary, the project encompasses ARIMA-based demand forecasting, evaluation of forecast accuracy, and integration of production planning, with Gantt charts providing concise visual representations for strategic decision-making in retail supply chain management.
+
