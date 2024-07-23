@@ -1,0 +1,65 @@
+pip install prophet
+import os
+import sys
+from tempfile import NamedTemporaryFile
+from urllib.request import urlopen
+from urllib.parse import unquote, urlparse
+from urllib.error import HTTPError
+from zipfile import ZipFile
+import tarfile
+import shutil
+
+CHUNK_SIZE = 40960
+DATA_SOURCE_MAPPING = 'dataset-superstore-20152018:https%3A%2F%2Fstorage.googleapis.com%2Fkaggle-data-sets%2F2072224%2F3439939%2Fbundle%2Farchive.zip%3FX-Goog-Algorithm%3DGOOG4-RSA-SHA256%26X-Goog-Credential%3Dgcp-kaggle-com%2540kaggle-161607.iam.gserviceaccount.com%252F20240610%252Fauto%252Fstorage%252Fgoog4_request%26X-Goog-Date%3D20240610T125331Z%26X-Goog-Expires%3D259200%26X-Goog-SignedHeaders%3Dhost%26X-Goog-Signature%3D277c1d405b0dd246d6d5562a956dec73de8b3edcc4e64f5c144d017720b9ba174ef10f5a7908621667ef0f7f31d41d61f63441976c01fdbb2dd8780bdf05ac10385a3199c75ec85cc611a907a5af4daa74fcd0e6fa617f36cd2a193a7b157809ff06307a54bb77cf054e366c4a8ee9d80f2149807badc9e887191207a27c83f66fd546011298ef6a59741fea23894461357725458c06fb9294deb4d9d4f586203ac45fe0c565d169321a1e2d7e2b79ce1537424bd2fe9e211903916d10bd2a2920a9bc7cdf595d1fb5d375940c839656caae29b7d2f7666fde41b2a161a6f927aa5de785d34d3ec806d2f7d9417f3a70c9fb09e23d631c15538fba5b41c3e450'
+
+KAGGLE_INPUT_PATH='/kaggle/input'
+KAGGLE_WORKING_PATH='/kaggle/working'
+KAGGLE_SYMLINK='kaggle'
+
+!umount /kaggle/input/ 2> /dev/null
+shutil.rmtree('/kaggle/input', ignore_errors=True)
+os.makedirs(KAGGLE_INPUT_PATH, 0o777, exist_ok=True)
+os.makedirs(KAGGLE_WORKING_PATH, 0o777, exist_ok=True)
+
+try:
+  os.symlink(KAGGLE_INPUT_PATH, os.path.join("..", 'input'), target_is_directory=True)
+except FileExistsError:
+  pass
+try:
+  os.symlink(KAGGLE_WORKING_PATH, os.path.join("..", 'working'), target_is_directory=True)
+except FileExistsError:
+  pass
+
+for data_source_mapping in DATA_SOURCE_MAPPING.split(','):
+    directory, download_url_encoded = data_source_mapping.split(':')
+    download_url = unquote(download_url_encoded)
+    filename = urlparse(download_url).path
+    destination_path = os.path.join(KAGGLE_INPUT_PATH, directory)
+    try:
+        with urlopen(download_url) as fileres, NamedTemporaryFile() as tfile:
+            total_length = fileres.headers['content-length']
+            print(f'Downloading {directory}, {total_length} bytes compressed')
+            dl = 0
+            data = fileres.read(CHUNK_SIZE)
+            while len(data) > 0:
+                dl += len(data)
+                tfile.write(data)
+                done = int(50 * dl / int(total_length))
+                sys.stdout.write(f"\r[{'=' * done}{' ' * (50-done)}] {dl} bytes downloaded")
+                sys.stdout.flush()
+                data = fileres.read(CHUNK_SIZE)
+            if filename.endswith('.zip'):
+              with ZipFile(tfile) as zfile:
+                zfile.extractall(destination_path)
+            else:
+              with tarfile.open(tfile.name) as tarfile:
+                tarfile.extractall(destination_path)
+            print(f'\nDownloaded and uncompressed: {directory}')
+    except HTTPError as e:
+        print(f'Failed to load (likely expired) {download_url} to path {destination_path}')
+        continue
+    except OSError as e:
+        print(f'Failed to load {download_url} to path {destination_path}')
+        continue
+
+print('Data source import complete.')
