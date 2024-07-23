@@ -1,0 +1,10 @@
+from  sklearn.metrics import mean_absolute_percentage_error
+
+mape= mean_absolute_percentage_error(test, pred)
+
+print('MAPE: %f' %mape)
+train.plot(legend=True, label='Train', figsize=(10,6))
+
+test.plot(legend=True, label= 'Test')
+
+pred.plot(legend=True, label='ARIMA prediction')
