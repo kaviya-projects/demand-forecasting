@@ -1,0 +1,5 @@
+pred= model.predict(start=len(train), end=(len(y)-1),dynamic=True)
+pred
+
+train= y[:40]
+test= y[40:]
