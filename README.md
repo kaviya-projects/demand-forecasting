@@ -1,7 +1,7 @@
-#ENHANCING SUPERMARKET INVENTORY MANAGEMENT
+ENHANCING SUPERMARKET INVENTORY MANAGEMENT
 THROUGH ARIMA AND SARIMAX - BASED DEMAND FORECASTING
 
-#Abstract:
+Abstract:
 Employing time series analysis, particularly the
 Auto Regressive Integrated Moving Average (ARIMA) model
 and its seasonal extension, Seasonal Auto Regressive Integrated
@@ -29,7 +29,7 @@ SARIMAX, making it a robust tool for retail demand
 forecasting.
 
 
-#Keywords:
+Keywords:
 
 Time Series Cross-Validation, ARIMA Model,
 SARIMAX Model, Mean Squared Error, Inventory Management,
